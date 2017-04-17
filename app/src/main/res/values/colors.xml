@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorBlack">#000</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="CONFETTI">#E9D460</color>
+    <color name="riptide">#FDE3A7</color>
+    <color name="afta7">#fff2d5</color>
+    <color name="title_background">#ff355689</color>
+    <color name="title_text">#ffffffff</color>
+    <color name="title_separator">#e1c78b</color>
+
+</resources>
