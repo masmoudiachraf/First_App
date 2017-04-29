@@ -34,7 +34,7 @@ import java.net.URL;
 public class LoginCoiffeur extends Activity{
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.4/Coiffeur/login_coiffeur.php";
+    private static String url_login = "http://192.168.1.5/Coiffeur/login_coiffeur.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     EditText inputName;
     EditText inputPrice;
     EditText inputDesc;
-    private static String url_login = "http://192.168.1.4/Coiffeur/login_client.php";
+    private static String url_login = "http://192.168.1.5/Coiffeur/login_client.php";
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
 

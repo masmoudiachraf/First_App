@@ -1,6 +1,7 @@
 package com.example.masmo.first_app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -8,11 +9,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +52,15 @@ public class AcceuilCoiffeur extends Activity
     private ProgressDialog pDialog;
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.162.42.252/Coiffeur/get_rdv_details.php";
-    private static String url_login1 = "http://192.162.42.252/Coiffeur/GetCoiffeur.php";
+    private static String url_login = "http://192.168.1.5/Coiffeur/get_rdv_details.php";
+    private static String url_login1 = "http://192.168.1.5/Coiffeur/GetCoiffeur.php";
+    private static String url_login2 = "http://192.168.1.5/Coiffeur/insert_rdv.php";
+    private static String url_login3 = "http://192.168.1.5/Coiffeur/GetCoiffureTypes.php";
+
+    String time_rv;
+    String id_coiff;
     private String cids;
+    private String currentdate;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +73,7 @@ public class AcceuilCoiffeur extends Activity
         String formattedDate = df.format(c.getTime());
         final TextView da = (TextView) findViewById(R.id.datecou);
         da.setText(formattedDate);
+        ;
 
         Intent int1=getIntent();
         int cid=int1.getIntExtra("coiffeurid",0);
@@ -69,8 +81,8 @@ public class AcceuilCoiffeur extends Activity
         Calendar c1 = Calendar.getInstance();
         SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate1 = df1.format(c1.getTime());
-
-        new GetTodayRdv().execute(cids,formattedDate1);
+        currentdate=formattedDate1;
+        new GetTodayRdv().execute(cids,currentdate);
 
         new GetCoiffeur().execute(cids);
 
@@ -117,13 +129,142 @@ public class AcceuilCoiffeur extends Activity
         listcli.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent tolisteclient = new Intent(AcceuilCoiffeur.this,Clients.class);
-                tolisteclient.putExtra("coiffeurid",cids);
+                Intent tolisteclient = new Intent(AcceuilCoiffeur.this,AcceuilMenu.class);
+                tolisteclient.putExtra("idcoiffeur",id_coiff);
                 startActivity(tolisteclient);
             }
         });
     }
 
+    private class GetCoiffeur extends AsyncTask<String, String, String>
+    {
+        ProgressDialog pdLoading = new ProgressDialog(AcceuilCoiffeur.this);
+        HttpURLConnection conn;
+        URL url = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //this method will be running on UI thread
+            pdLoading.setMessage("\tLoading");
+            pdLoading.setCancelable(false);
+            pdLoading.show();
+
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+
+                // Enter URL address where your php file resides
+                url = new URL(url_login1);
+
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return e.toString();
+            }
+            try {
+                // Setup HttpURLConnection class to send and receive data from php and mysql
+                conn = (HttpURLConnection)url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("POST");
+
+                // setDoInput and setDoOutput method depict handling of both send and receive
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                // Append parameters to URL
+                Uri.Builder builder = new Uri.Builder()
+                        .appendQueryParameter("id", params[0]);
+                String query = builder.build().getEncodedQuery();
+
+                // Open connection for sending data
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+                conn.connect();
+
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return "exception";
+            }
+
+            try {
+
+                int response_code = conn.getResponseCode();
+
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
+
+                    // Read data sent from server
+                    InputStream input = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    // Pass data to onPostExecute method
+                    return(result.toString());
+
+                }else{
+
+                    return("unsuccessful");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "exception";
+            } finally {
+                conn.disconnect();
+            }
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            //this method will be running on UI thread
+
+
+            pdLoading.dismiss();
+
+            if(!result.isEmpty())
+            {
+
+                try {
+                    JSONObject loggedin = new JSONObject(result);
+                    JSONArray cli= loggedin.getJSONArray("coiffeur");
+                    JSONObject js = cli.getJSONObject(0);
+                    id_coiff= Integer.toString(js.getInt("id"));
+                    TextView iden = (TextView)findViewById(R.id.iden_coif);
+                    iden.setText(js.getString("name"));
+
+                }catch(JSONException e)
+                {Toast.makeText(AcceuilCoiffeur.this, e.toString(), Toast.LENGTH_LONG).show();}
+
+            }else if (result.isEmpty())
+            {
+
+            }
+            else
+            {
+                Toast.makeText(AcceuilCoiffeur.this,result,Toast.LENGTH_LONG).show();
+
+            }
+        }
+
+    }
 
     private class GetTodayRdv extends AsyncTask<String, String, String>
     {
@@ -243,7 +384,7 @@ public class AcceuilCoiffeur extends Activity
             int id_coifeur=0;
             int k=0;
             try {
-                String[]tabl= getResources().getStringArray(R.array.time);
+                final String[]tabl= getResources().getStringArray(R.array.time);
                 List<DataItem> fullday;
                 fullday =new ArrayList<>();
                 for (k = 0; k < tabl.length; k++) {
@@ -275,8 +416,8 @@ public class AcceuilCoiffeur extends Activity
                     }
                 }
                 try {
-                    ListView lv = (ListView) findViewById(R.id.rv1);
-                    CustomAdapter adapter = new CustomAdapter(AcceuilCoiffeur.this, fullday);
+                   final ListView lv = (ListView) findViewById(R.id.rv1);
+                    final CustomAdapter adapter = new CustomAdapter(AcceuilCoiffeur.this, fullday);
                     lv.setAdapter(adapter);
                     for (int o=0;o<fullday.size();o++)
                     {
@@ -296,8 +437,13 @@ public class AcceuilCoiffeur extends Activity
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             if((Integer)view.getTag()==0)
                             {
-                                Intent tonew = new Intent(AcceuilCoiffeur.this,NewRV.class);
-                                startActivity(tonew);
+                                Object a = (Object)lv.getItemIdAtPosition(position);
+                                int pos = Integer.parseInt(a.toString());
+                                time_rv = tabl[pos];
+
+                                new GetTypeCoiffure().execute(id_coiff);
+                                adapter.notifyDataSetChanged();
+                                lv.setAdapter(adapter);
                             }else
                             {
                                 int idrv=(Integer)view.getTag();
@@ -324,7 +470,7 @@ public class AcceuilCoiffeur extends Activity
 
     }
 
-    private class GetCoiffeur extends AsyncTask<String, String, String>
+    private class GetTypeCoiffure extends AsyncTask<String, String, String>
     {
         ProgressDialog pdLoading = new ProgressDialog(AcceuilCoiffeur.this);
         HttpURLConnection conn;
@@ -345,7 +491,7 @@ public class AcceuilCoiffeur extends Activity
             try {
 
                 // Enter URL address where your php file resides
-                url = new URL(url_login1);
+                url = new URL(url_login3);
 
             } catch (MalformedURLException e) {
                 // TODO Auto-generated catch block
@@ -365,7 +511,7 @@ public class AcceuilCoiffeur extends Activity
 
                 // Append parameters to URL
                 Uri.Builder builder = new Uri.Builder()
-                        .appendQueryParameter("id", params[0]);
+                        .appendQueryParameter("id_coiffeur", params[0]);
                 String query = builder.build().getEncodedQuery();
 
                 // Open connection for sending data
@@ -429,21 +575,43 @@ public class AcceuilCoiffeur extends Activity
 
             if(!result.isEmpty())
             {
-                String id_coiff=null;
+                List<String> data=new ArrayList<>();
+
                 try {
                     JSONObject loggedin = new JSONObject(result);
-                    JSONArray cli= loggedin.getJSONArray("coiffeur");
-                    JSONObject js = cli.getJSONObject(0);
-                    id_coiff= Integer.toString(js.getInt("id"));
-                    TextView iden = (TextView)findViewById(R.id.iden_coif);
-                    iden.setText(js.getString("name"));
+                    JSONArray coi= loggedin.getJSONArray("type");
+                    for(int i=0;i<coi.length();i++)
+                    {
+                        JSONObject js = coi.getJSONObject(i);
+                        String type_name = js.getString("nom");
+                        data.add(type_name);
+                    }
+                    AlertDialog.Builder mBuil= new AlertDialog.Builder(AcceuilCoiffeur.this);
+                    View mView = getLayoutInflater().inflate(R.layout.new_rv,null);
+
+                    final Spinner c=(Spinner)mView.findViewById(R.id.type_coiff);
+                    ArrayAdapter<String> a = new ArrayAdapter<String>(AcceuilCoiffeur.this,android.R.layout.simple_spinner_item,data);
+                    c.setAdapter(a);
+
+                    Button add = (Button)mView.findViewById(R.id.add_rdv_btn);
+                    add.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String type=c.getSelectedItem().toString();
+                            new InsertClient().execute(cids,id_coiff,currentdate,type,time_rv);
+                        }
+                    });
+                    mBuil.setView(mView);
+                    AlertDialog dialog = mBuil.create();
+                    dialog.show();
 
                 }catch(JSONException e)
-                {Toast.makeText(AcceuilCoiffeur.this, e.toString(), Toast.LENGTH_LONG).show();}
+                {
+                    Toast.makeText(AcceuilCoiffeur.this, e.toString(), Toast.LENGTH_LONG).show();}
 
             }else if (result.isEmpty())
             {
-
+                Toast.makeText(AcceuilCoiffeur.this,"empty",Toast.LENGTH_LONG).show();
             }
             else
             {
@@ -453,5 +621,138 @@ public class AcceuilCoiffeur extends Activity
         }
 
     }
+
+    private class InsertClient extends AsyncTask<String, String, String>
+    {
+        ProgressDialog pdLoading = new ProgressDialog(AcceuilCoiffeur.this);
+        HttpURLConnection conn;
+        URL url = null;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //this method will be running on UI thread
+            pdLoading.setMessage("\tLoading");
+            pdLoading.setCancelable(false);
+            pdLoading.show();
+
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+
+                // Enter URL address where your php file resides
+                url = new URL(url_login2);
+
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return e.toString();
+            }
+            try {
+                // Setup HttpURLConnection class to send and receive data from php and mysql
+                conn = (HttpURLConnection)url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("POST");
+
+                // setDoInput and setDoOutput method depict handling of both send and receive
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                // Append parameters to URL
+                Uri.Builder builder = new Uri.Builder()
+                        .appendQueryParameter("cids", params[0])
+                        .appendQueryParameter("id_coiff", params[1])
+                        .appendQueryParameter("date_rv", params[2])
+                        .appendQueryParameter("type", params[3])
+                        .appendQueryParameter("time_rv", params[4]);
+                String query = builder.build().getEncodedQuery();
+
+                // Open connection for sending data
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+                conn.connect();
+
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return "exception";
+            }
+
+            try {
+
+                int response_code = conn.getResponseCode();
+
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
+
+                    // Read data sent from server
+                    InputStream input = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    // Pass data to onPostExecute method
+                    return(result.toString());
+
+                }else{
+
+                    return("unsuccessful");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "exception";
+            } finally {
+                conn.disconnect();
+            }
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            //this method will be running on UI thread
+
+
+            pdLoading.dismiss();
+
+            if(result.equals("echec2"))
+            {
+                Toast.makeText(AcceuilCoiffeur.this,"erreur lors de l'insertion",Toast.LENGTH_LONG).show();
+
+            }else if (result.equals("echec1"))
+            {
+                Toast.makeText(AcceuilCoiffeur.this,"404",Toast.LENGTH_LONG).show();
+            }else if (result.equals("succ"))
+            {
+                new GetTodayRdv().execute(cids,currentdate);
+                Toast.makeText(AcceuilCoiffeur.this,"normalement t'ajouta",Toast.LENGTH_LONG).show();
+            }
+            else if (result.isEmpty())
+            {
+                Toast.makeText(AcceuilCoiffeur.this,"empty",Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(AcceuilCoiffeur.this,result,Toast.LENGTH_LONG).show();
+
+            }
+        }
+
+    }
+
 
 }

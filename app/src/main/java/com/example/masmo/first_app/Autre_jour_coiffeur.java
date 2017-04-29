@@ -44,8 +44,8 @@ public class Autre_jour_coiffeur extends Activity {
     private ProgressDialog pDialog;
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.4/Coiffeur/get_rdv_details.php";
-    private static String url_login1 = "http://192.168.1.4/Coiffeur/GetCoiffeur.php";
+    private static String url_login = "http://192.168.1.5/Coiffeur/get_rdv_details.php";
+    private static String url_login1 = "http://192.168.1.5/Coiffeur/GetCoiffeur.php";
     String dateselectionne;
     protected void onCreate(Bundle savedInstanceState)
     {

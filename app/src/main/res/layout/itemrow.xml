@@ -3,49 +3,53 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/liste1">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center|left"
+    android:background="?attr/selectableItemBackground" >
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-            <TextView
+
+    <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="12:00"
                 android:gravity="left|center_vertical"
-                android:layout_marginLeft="40px"
+                android:layout_marginLeft="100px"
                 android:id="@+id/timee"
                 android:textColor="@color/colorBlack"/>
-        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="100px">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Achraf Masmoudi"
+            android:textColor="@color/colorBlack"
+            android:id="@+id/nomm"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorBlack"
+            android:gravity="right"
+            android:id="@+id/typ"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="52667837"
+            android:textColor="@color/aaa"
+            android:textSize="20px"
+            android:id="@+id/numeroo"/>
+    </LinearLayout>
 
 
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Achraf Masmoudi"
-                android:textColor="@color/colorBlack"
-                android:id="@+id/nomm"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="52667837"
-                android:textColor="@color/colorBlack"
-                android:id="@+id/numeroo"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="bottom|right"
-                android:id="@+id/typ"/>
-        </LinearLayout>
+</LinearLayout>
 
     </LinearLayout>
 

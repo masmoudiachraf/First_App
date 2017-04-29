@@ -39,8 +39,8 @@ public class Inscription extends Activity
 {
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.4/Coiffeur/GetAllCoiffeurs.php";
-    private static String url_login1 = "http://192.168.1.4/Coiffeur/Inscription_client.php";
+    private static String url_login = "http://192.168.1.5/Coiffeur/GetAllCoiffeurs.php";
+    private static String url_login1 = "http://192.168.1.5/Coiffeur/Inscription_client.php";
 
 
     protected void onCreate(Bundle savedInstanceState) {

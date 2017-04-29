@@ -6,7 +6,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="@color/riptide">
+    android:background="@color/riptide"
+    android:gravity="center">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,21 +17,10 @@
         android:layout_gravity="center_vertical|center_horizontal|center">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@mipmap/face"/>
-        </LinearLayout>
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginTop="50px">
+            android:gravity="center">
 
             <Spinner
                 android:layout_width="match_parent"
@@ -48,7 +38,7 @@
                     android:text="Ajouter"
                     android:textColor="@color/colorBlack"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                    android:id="@+id/connect"/>
+                    android:id="@+id/add_rdv_btn"/>
             </LinearLayout>
 
         </LinearLayout>
