@@ -28,6 +28,7 @@ import java.util.Calendar;
 public class AcceuilMenu extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    String coiffid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +36,7 @@ public class AcceuilMenu extends AppCompatActivity
 
         setContentView(R.layout.activity_acceuil_menu);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Acceuil coiffeur");
+        toolbar.setTitle("Accueil coiffeur");
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -45,6 +46,27 @@ public class AcceuilMenu extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy");
+        String formattedDate = df.format(c.getTime());
+        Intent int1=getIntent();
+        int id=int1.getIntExtra("coiffeurid",0);
+        String cid = Integer.toString(id);
+        coiffid=cid;
+        Bundle bundle = new Bundle();
+        bundle.putString("date", formattedDate);
+        bundle.putString("coiffeurid", cid);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment;
+        fragment = new MessagesFragment();
+        fragment.setArguments(bundle);
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_acceuil_menu, fragment);
+        fragmentTransaction.commit();
 
 
         ImageButton ib = (ImageButton)findViewById(R.id.calendar);
@@ -68,8 +90,8 @@ public class AcceuilMenu extends AppCompatActivity
                         fragment = new MessagesFragment();
 
                         Intent int1=getIntent();
-                        String cid=int1.getStringExtra("idcoiffeur");
-
+                        int id=int1.getIntExtra("coiffeurid",0);
+                        String cid = Integer.toString(id);
                         Bundle bundle = new Bundle();
                         bundle.putString("date", ndate);
                         bundle.putString("coiffeurid", cid);
@@ -127,6 +149,9 @@ public class AcceuilMenu extends AppCompatActivity
         Fragment fragment;
         if (id == R.id.nav_camera) {
             fragment = new HomeFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("coiffeurid", coiffid);
+            fragment.setArguments(bundle);
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.content_acceuil_menu, fragment);
             fragmentTransaction.commit();
@@ -136,14 +161,10 @@ public class AcceuilMenu extends AppCompatActivity
             fragmentTransaction.replace(R.id.content_acceuil_menu, fragment);
             fragmentTransaction.commit();
         } else if (id == R.id.nav_slideshow) {
-            fragment = new MessagesFragment();
+            fragment = new ListeRDVNonConfirme();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.content_acceuil_menu, fragment);
             fragmentTransaction.commit();
-        }  else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

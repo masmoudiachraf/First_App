@@ -49,10 +49,10 @@ public class Autre_jours extends Activity
     private ProgressDialog pDialog;
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.5/Coiffeur/get_rdv_details.php";
-    private static String url_login1 = "http://192.168.1.5/Coiffeur/GetClient.php";
-    private static String url_login2 = "http://192.168.1.5/Coiffeur/insert_rdv.php";
-    private static String url_login3 = "http://192.168.1.5/Coiffeur/GetCoiffureTypes.php";
+    private static String url_login = "http://192.168.1.7/Coiffeur/get_rdv_details.php";
+    private static String url_login1 = "http://192.168.1.7/Coiffeur/GetClient.php";
+    private static String url_login2 = "http://192.168.1.7/Coiffeur/insert_rdv.php";
+    private static String url_login3 = "http://192.168.1.7/Coiffeur/GetCoiffureTypes.php";
 
     String dateselectionne;
     String otherday;
@@ -402,10 +402,7 @@ public class Autre_jours extends Activity
 
                             }else
                             {
-                                int idrv=(Integer)view.getTag();
-                                Intent toedit = new Intent(Autre_jours.this,EditRV.class);
-                                toedit.putExtra("rvid",idrv);
-                                startActivity(toedit);
+                                Toast.makeText(Autre_jours.this, "edit", Toast.LENGTH_LONG).show();
                             }
                         }
                     });

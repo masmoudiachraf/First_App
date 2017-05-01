@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorBlack">#000</color>
-    <color name="colorAccent">#ffeb3b</color>
+    <color name="colorAccent">#333333</color>
     <color name="CONFETTI">#E9D460</color>
     <color name="riptide">#FDE3A7</color>
     <color name="afta7">#fff2d5</color>
@@ -14,4 +14,8 @@
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
+    <color name="tirquoise">#1abc9c</color>
+    <color name="rougecalendar">#ff6464</color>
+    <color name="floatcolor">#333333</color>
+    <color name="backgroundcolor">#e1e1e1</color>
 </resources>

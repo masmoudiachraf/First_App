@@ -34,7 +34,7 @@ import java.net.URL;
 public class LoginCoiffeur extends Activity{
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.5/Coiffeur/login_coiffeur.php";
+    private static String url_login = "http://192.168.1.7/Coiffeur/login_coiffeur.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +183,7 @@ public class LoginCoiffeur extends Activity{
 
                 }catch(JSONException e)
                 {Toast.makeText(LoginCoiffeur.this, e.toString(), Toast.LENGTH_LONG).show();}
-                Intent intent = new Intent(LoginCoiffeur.this,AcceuilCoiffeur.class);
+                Intent intent = new Intent(LoginCoiffeur.this,AcceuilMenu.class);
                 intent.putExtra("coiffeurid",coiffeur_id);
                 startActivity(intent);
                 LoginCoiffeur.this.finish();

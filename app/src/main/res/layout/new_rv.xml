@@ -3,9 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+
     android:background="@color/riptide"
     android:gravity="center">
 
@@ -21,11 +19,32 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ajouter un Rendez-vous"
+                android:textColor="@color/textColorPrimary"
+                android:textSize="40px"
+                android:textAlignment="center"
+                android:background="@color/floatcolor"/>
+            <TimePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10px"
+                android:id="@+id/timePicker2" />
+
 
             <Spinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/type_coiff"></Spinner>
+                android:id="@+id/nomclient"
+                android:layout_margin="10px"></Spinner>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/type_coiff"
+                android:layout_margin="10px"></Spinner>
 
             <LinearLayout
                 android:layout_width="match_parent"

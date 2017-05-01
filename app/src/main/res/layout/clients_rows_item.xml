@@ -3,16 +3,34 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="left|center">
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/nomCli"
-       android:text="aaaa"
-       android:layout_marginLeft="20px"/>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/usersicon"
+        android:layout_marginLeft="20px"/>
+    <LinearLayout
+        android:layout_width="300px"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="50px">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/nomCli"
+            android:text="aaaa"
+            android:layout_marginLeft="20px"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/numCli"
+            android:text="aaaa"
+            android:layout_marginLeft="20px"/>
+    </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/StatCli"
         android:text="bbbbb"
-        android:layout_marginLeft="20px"/>
+        android:layout_marginLeft="50px" />
 </LinearLayout>

@@ -57,10 +57,10 @@ public class Acceuil extends Activity {
     private ProgressDialog pDialog;
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.5/Coiffeur/get_rdv_details.php";
-    private static String url_login1 = "http://192.168.1.5/Coiffeur/GetClient.php";
-    private static String url_login2 = "http://192.168.1.5/Coiffeur/insert_rdv.php";
-    private static String url_login3 = "http://192.168.1.5/Coiffeur/GetCoiffureTypes.php";
+    private static String url_login = "http://192.168.1.7/Coiffeur/get_rdv_details.php";
+    private static String url_login1 = "http://192.168.1.7/Coiffeur/GetClient.php";
+    private static String url_login2 = "http://192.168.1.7/Coiffeur/insert_rdv.php";
+    private static String url_login3 = "http://192.168.1.7/Coiffeur/GetCoiffureTypes.php";
 
     private String cids;
     private String currentdate;
@@ -738,6 +738,11 @@ public class Acceuil extends Activity {
             }else if (result.equals("succ"))
             {
                 Toast.makeText(Acceuil.this,"normalement t'ajouta",Toast.LENGTH_LONG).show();
+                Calendar c = Calendar.getInstance();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                String formattedDate = df.format(c.getTime());
+                new GetTodayRdv().execute(id_coiff,formattedDate);
+
             }
             else if (result.isEmpty())
             {

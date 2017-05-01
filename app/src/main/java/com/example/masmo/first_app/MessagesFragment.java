@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -52,10 +55,11 @@ public class MessagesFragment extends Fragment {
     private ProgressDialog pDialog;
     public static final int CONNECTION_TIMEOUT=10000;
     public static final int READ_TIMEOUT=15000;
-    private static String url_login = "http://192.168.1.5/Coiffeur/get_rdv_details.php";
-    private static String url_login1 = "http://192.168.1.5/Coiffeur/GetCoiffeur.php";
-    private static String url_login2 = "http://192.168.1.5/Coiffeur/insert_rdv.php";
-    private static String url_login3 = "http://192.168.1.5/Coiffeur/GetCoiffureTypes.php";
+    private static String url_login = "http://192.168.1.7/Coiffeur/get_rdv_details.php";
+    private static String url_login1 = "http://192.168.1.7/Coiffeur/GetCoiffeur.php";
+    private static String url_login2 = "http://192.168.1.7/Coiffeur/insert_rdv.php";
+    private static String url_login3 = "http://192.168.1.7/Coiffeur/GetCoiffureTypes.php";
+    private static String url_login4 = "http://192.168.1.7/Coiffeur/GetCoiffeurAllClients.php";
 
     String time_rv;
     String id_coiff;
@@ -82,7 +86,16 @@ public class MessagesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
+
+        FloatingActionButton fab = (FloatingActionButton)rootView.findViewById(R.id.fabrdv);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new GetTypeCoiffure().execute(cid);
+
+            }
+        });
         String i=null;
         Bundle bundle = this.getArguments();
         if (bundle != null) {
@@ -118,6 +131,152 @@ public class MessagesFragment extends Fragment {
         super.onDetach();
     }
 
+
+    private class GetCoiffeurAllClients extends AsyncTask<String, String, String>
+    {
+        ProgressDialog pdLoading = new ProgressDialog(getActivity());
+        HttpURLConnection conn;
+        URL url = null;
+        View getpopupview;
+        public GetCoiffeurAllClients(View v)
+        {
+            getpopupview=v;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            //this method will be running on UI thread
+            pdLoading.setMessage("\tLoading");
+            pdLoading.setCancelable(false);
+            pdLoading.show();
+
+        }
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+
+                // Enter URL address where your php file resides
+                url = new URL(url_login4);
+
+            } catch (MalformedURLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return e.toString();
+            }
+            try {
+                // Setup HttpURLConnection class to send and receive data from php and mysql
+                conn = (HttpURLConnection)url.openConnection();
+                conn.setReadTimeout(READ_TIMEOUT);
+                conn.setConnectTimeout(CONNECTION_TIMEOUT);
+                conn.setRequestMethod("POST");
+
+                // setDoInput and setDoOutput method depict handling of both send and receive
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                // Append parameters to URL
+                Uri.Builder builder = new Uri.Builder()
+                        .appendQueryParameter("id", params[0]);
+                String query = builder.build().getEncodedQuery();
+
+                // Open connection for sending data
+                OutputStream os = conn.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(
+                        new OutputStreamWriter(os, "UTF-8"));
+                writer.write(query);
+                writer.flush();
+                writer.close();
+                os.close();
+                conn.connect();
+
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return "exception";
+            }
+
+            try {
+
+                int response_code = conn.getResponseCode();
+
+                // Check if successful connection made
+                if (response_code == HttpURLConnection.HTTP_OK) {
+
+                    // Read data sent from server
+                    InputStream input = conn.getInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+                    StringBuilder result = new StringBuilder();
+                    String line;
+
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    // Pass data to onPostExecute method
+                    return(result.toString());
+
+                }else{
+
+                    return("unsuccessful");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "exception";
+            } finally {
+                conn.disconnect();
+            }
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            //this method will be running on UI thread
+
+
+            pdLoading.dismiss();
+
+            if(!result.isEmpty())
+            {
+                List<String> data=new ArrayList<>();
+
+                try {
+                    JSONObject loggedin = new JSONObject(result);
+                    JSONArray coi= loggedin.getJSONArray("client");
+                    for(int i=0;i<coi.length();i++)
+                    {
+                        JSONObject js = coi.getJSONObject(i);
+                        String idclient = Integer.toString(js.getInt("id"));
+                        String clientname = js.getString("name");
+                        data.add(idclient+"/ "+clientname);
+                    }
+
+
+                    final Spinner c=(Spinner)getpopupview.findViewById(R.id.nomclient);
+                    ArrayAdapter<String> adapterclient = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,data);
+                    c.setAdapter(adapterclient);
+
+
+
+                }catch(JSONException e)
+                {
+                    Toast.makeText(getContext(), e.toString(), Toast.LENGTH_LONG).show();}
+
+            }else if (result.isEmpty())
+            {
+                Toast.makeText(getContext(),"empty",Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(getContext(),result,Toast.LENGTH_LONG).show();
+
+            }
+        }
+
+    }
 
     private class GetTodayRdv extends AsyncTask<String, String, String>
     {
@@ -220,8 +379,6 @@ public class MessagesFragment extends Fragment {
 
             //this method will be running on UI thread
             pdLoading.dismiss();
-            List<String> data=new ArrayList<>();
-            pdLoading.dismiss();
                 /* Here launching another activity when login successful. If you persist login state
                 use sharedPreferences of Android. and logout button to clear sharedPreferences.
                  */
@@ -230,8 +387,9 @@ public class MessagesFragment extends Fragment {
             String nume =null;
             String ty = null;
             int id = 0;
-            int id_coifeur=0;
             int k=0;
+            List<DataItem> lsData;
+            lsData = new ArrayList<>();
             try {
                 final String[]tabl= getResources().getStringArray(R.array.time);
                 List<DataItem> fullday;
@@ -243,12 +401,13 @@ public class MessagesFragment extends Fragment {
                     JSONObject loggedin = new JSONObject(result);
                     JSONArray coi = loggedin.getJSONArray("rdv");
 
-                    List<DataItem> lsData;
-                    lsData = new ArrayList<>();
+
                     for (int i = 0; i < coi.length(); i++) {
                         JSONObject js = coi.getJSONObject(i);
                         propietere_rdv = js.getString("name");
-                        temps_rdv = js.getString("temps");
+                        String temps = js.getString("temps");
+                        String tem[] = temps.split(":");
+                        temps_rdv=tem[0]+":"+tem[1];
                         nume = js.getString("num");
                         ty= js.getString("typeCoiff");
                         id = js.getInt("id");
@@ -268,7 +427,7 @@ public class MessagesFragment extends Fragment {
                 try {
 
                     final ListView lv = (ListView)getView().findViewById(R.id.fraglist);
-                    final CustomAdapter adapter = new CustomAdapter(getActivity(), fullday);
+                    final CustomAdapter adapter = new CustomAdapter(getActivity(), lsData);
                     lv.setAdapter(adapter);
                     for (int o=0;o<fullday.size();o++)
                     {
@@ -294,10 +453,7 @@ public class MessagesFragment extends Fragment {
                                 new GetTypeCoiffure().execute(cid);
                             }else
                             {
-                                int idrv=(Integer)view.getTag();
-                                Intent toedit = new Intent(getContext(),EditRV.class);
-                                toedit.putExtra("rvid",idrv);
-                                startActivity(toedit);
+                                Toast.makeText(getActivity(), "edit", Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -436,24 +592,35 @@ public class MessagesFragment extends Fragment {
                     }
                     final AlertDialog.Builder mBuil= new AlertDialog.Builder(getActivity());
 
-                    View mView = LayoutInflater.from(getActivity()).inflate(R.layout.new_rv,null);
+                    final View mView = LayoutInflater.from(getActivity()).inflate(R.layout.new_rv,null);
 
 
                     final Spinner c=(Spinner)mView.findViewById(R.id.type_coiff);
                     ArrayAdapter<String> a = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,data);
                     c.setAdapter(a);
+                    new GetCoiffeurAllClients(mView).execute(cid);
+                    final TimePicker picktime = (TimePicker)mView.findViewById(R.id.timePicker2);
+                    picktime.setIs24HourView(true);
 
                     Button add = (Button)mView.findViewById(R.id.add_rdv_btn);
-                    mBuil.setView(mView);
-                    AlertDialog dialog = mBuil.create();
-                    dialog.show();
                     add.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             String type=c.getSelectedItem().toString();
-                            new InsertClient().execute(cid,cid,currentdate,type,time_rv);
+                            Spinner select=(Spinner)mView.findViewById(R.id.nomclient);
+                            String idandname [] = select.getSelectedItem().toString().split("/");
+                            String idclient = idandname[0];
+                            int hour = picktime.getCurrentHour();
+                            int min = picktime.getCurrentMinute();
+                            String time = hour+":"+min;
+
+                        new InsertClient().execute(idclient,cid,currentdate,type,time);
                         }
                     });
+                    mBuil.setView(mView);
+                    AlertDialog dialog = mBuil.create();
+                    dialog.show();
+
 
                 }catch(JSONException e)
                 {
